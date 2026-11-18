@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VELA NEGRA — Puerto Cobalto</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js" } }
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="scene"></canvas>
+  <div id="vignette"></div>
+  <div id="rain-layer"></div>
+
+  <div id="hud" class="hidden">
+    <div id="hud-topleft">
+      <div id="wallet">$<span id="money">0</span><span id="debt"> / utang $40.000</span></div>
+      <div id="vitals">
+        <div class="bar"><div id="health-fill"></div><span>SEHAT</span></div>
+        <div class="bar armor"><div id="armor-fill"></div><span>ARMOR</span></div>
+      </div>
+      <div id="mission-chip"><span id="mission-act">BABAK I</span><span id="mission-name">—</span></div>
+    </div>
+    <div id="hud-topright">
+      <div id="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+      <div id="clock-weather"><span id="clock">17:40</span><span id="weather-icon">☀</span><span id="weather-label">Cerah</span></div>
+      <div id="district">Centro Alba</div>
+    </div>
+    <div id="hud-bottomleft">
+      <canvas id="minimap" width="184" height="184"></canvas>
+      <div id="objective"><span id="objective-label">OBJEKTIF</span><span id="objective-text">—</span></div>
+    </div>
+    <div id="hud-bottomright">
+      <div id="speed"><span id="speed-value">0</span><span id="speed-unit">km/j</span></div>
+      <div id="weapon"><span id="weapon-icon">🔫</span><span id="weapon-name">Pistol</span><span id="ammo">12 / ∞</span></div>
+      <div id="vehicle-name">Jalan kaki</div>
+    </div>
+    <div id="subtitle"></div>
+    <div id="toasts"></div>
+    <div id="mission-list"></div>
+    <div id="timer-chip" class="hidden">⏱ <span id="timer-value">0:00</span></div>
+    <div id="crosshair"><span></span></div>
+    <div id="radio-chip">♪ <span id="radio-name">Radio Alba 94.1</span></div>
+    <div id="damage-flash"></div>
+  </div>
+
+  <div id="screen-title" class="screen">
+    <div class="title-inner">
+      <div class="title-kicker">PUERTO COBALTO &nbsp;•&nbsp; TELUK YANG TAK PERNAH TIDUR</div>
+      <h1>VELA<br>NEGRA</h1>
+      <p class="title-tagline">Empat puluh ribu dolar. Satu kapal. Satu adik — sebelum air pasang.</p>
+      <div class="title-menu">
+        <button id="btn-continue" class="menu-btn primary">LANJUTKAN</button>
+        <button id="btn-new" class="menu-btn">PERMAINAN BARU</button>
+        <button id="btn-how" class="menu-btn">CARA MAIN</button>
+      </div>
+      <div id="howto" class="hidden">
+        <p><b>WASD</b> gerak / mengemudi &nbsp;•&nbsp; <b>E</b> masuk-keluar mobil &nbsp;•&nbsp; <b>Mouse</b> kamera, <b>klik</b> tembak &nbsp;•&nbsp; <b>1/2/3</b> ganti senjata &nbsp;•&nbsp; <b>Shift</b> lari &nbsp;•&nbsp; <b>M</b> peta &nbsp;•&nbsp; <b>P</b> jeda &nbsp;•&nbsp; <b>G</b> garasi &nbsp;•&nbsp; <b>B</b> toko senjata &nbsp;•&nbsp; <b>Spasi</b> rem tangan</p>
+        <p>Curi mobil, kerjakan misi Teo Barros, lunasi utang $40.000 ke Orlando Vasco sebelum kapal Dani berlayar. Polisi naik bintang bila kau terlihat berbuat onar — sembunyi sampai kerucut pencarian memudar.</p>
+      </div>
+      <div class="title-foot">Game orisinal • Kota, nama &amp; cerita fiktif • v2 — dibuat untuk make.fun gta6-01</div>
+    </div>
+  </div>
+
+  <div id="screen-pause" class="screen hidden">
+    <div class="panel">
+      <h2>JEDA</h2>
+      <p id="pause-summary">—</p>
+      <div class="row"><button id="btn-resume" class="menu-btn primary">LANJUTKAN</button><button id="btn-map" class="menu-btn">PETA KOTA</button></div>
+      <div class="row"><button id="btn-save" class="menu-btn">SIMPAN</button><button id="btn-quit-title" class="menu-btn">MENU UTAMA</button></div>
+    </div>
+  </div>
+
+  <div id="screen-map" class="screen hidden">
+    <div class="panel wide">
+      <h2>PETA PUERTO COBALTO</h2>
+      <canvas id="bigmap" width="640" height="420"></canvas>
+      <p class="muted">Casco Viejo • Zona Puerto • Centro Alba • Barrio Sal • Playa Brava — Faro Alba • Jembatan Cobalto • Gran Muelle</p>
+      <button id="btn-close-map" class="menu-btn primary">TUTUP [M]</button>
+    </div>
+  </div>
+
+  <div id="screen-briefing" class="screen hidden">
+    <div class="panel">
+      <div class="brief-head"><span id="brief-portrait">🧔</span><div><div id="brief-speaker">Cami Reyes</div><div id="brief-act">BABAK I</div></div></div>
+      <h2 id="brief-title">Misi</h2>
+      <p id="brief-text">—</p>
+      <div id="brief-meta">Bayaran: <b id="brief-pay">$0</b> &nbsp;•&nbsp; Gagal bila: <span id="brief-fail">—</span></div>
+      <div class="row"><button id="btn-start-mission" class="menu-btn primary">MULAI MISI</button><button id="btn-later-mission" class="menu-btn">NANTI</button></div>
+    </div>
+  </div>
+
+  <div id="screen-shop" class="screen hidden">
+    <div class="panel wide">
+      <h2>TOKO SENJATA — “EL FARO”</h2>
+      <p class="muted">Dompet: <b id="shop-money">$0</b> — amunisi dan armor dibeli di sini, bukan ditemukan di jalan.</p>
+      <div id="shop-list"></div>
+      <button id="btn-close-shop" class="menu-btn primary">TUTUP [B]</button>
+    </div>
+  </div>
+
+  <div id="screen-garage" class="screen hidden">
+    <div class="panel wide">
+      <h2>GARASI CAMI — CASCO VIEJO</h2>
+      <p class="muted">Dompet: <b id="garage-money">$0</b> — cat, velg, spoiler, lampu bawah. Modifikasi tersimpan per mobil.</p>
+      <div id="garage-list"></div>
+      <button id="btn-close-garage" class="menu-btn primary">TUTUP [G]</button>
+    </div>
+  </div>
+
+  <div id="screen-over" class="screen hidden">
+    <div class="panel">
+      <h2 id="over-title">TERTANGKAP</h2>
+      <p id="over-text">—</p>
+      <div class="row"><button id="btn-retry" class="menu-btn primary">COBA LAGI</button><button id="btn-over-title" class="menu-btn">MENU UTAMA</button></div>
+    </div>
+  </div>
+
+  <div id="loading"><div class="load-box"><div class="load-title">VELA NEGRA</div><div id="load-text">Memuat Puerto Cobalto…</div><div class="load-bar"><div id="load-fill"></div></div></div></div>
+  <p id="status" role="status" aria-live="polite"></p>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
